@@ -1,5 +1,4 @@
 # -Smart-City-Traffic-Pattern-Analyser
-- Downloads the Chicago traffic dataset using `wget` and saves it as `chicago_traffic.csv`.
 - Imports essential Python libraries:
   - `pandas` for data manipulation.
   - `numpy` for numerical operations.
@@ -7,9 +6,6 @@
 - Loads the CSV file into a DataFrame using `pd.read_csv()`, with the `TIME` column parsed as datetime format.
 - Prints the shape of the dataset to show the number of rows and columns.
 - Displays the first 5 rows of the dataset using `df.head()` to preview the structure and content.
-
-# Direct download link (alternative: download manually)
-!wget https://data.cityofchicago.org/api/views/77hq-huss/rows.csv?accessType=DOWNLOAD -O chicago_traffic.csv
 #  Import essential libraries
 import pandas as pd
 import numpy as np
@@ -17,7 +13,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load data
-df = pd.read_csv('chicago_traffic.csv', parse_dates=['TIME'])
+df = pd.read_csv('traffic.csv', parse_dates=['TIME'])
 print(f"Dataset shape: {df.shape}")
 df.head()
 - Checks for missing values in each column using `df.isnull().sum()` and prints the result.
