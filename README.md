@@ -179,3 +179,191 @@ plt.figure(figsize=(12,6))
 sns.lineplot(data=anomaly_window, x='TIME', y='SPEED')
 plt.title(f"Traffic Anomaly Detected at {sample_anomaly}")
 plt.savefig('anomaly.png', dpi=300)
+
+## 📊 Heatmap: Traffic Speed Patterns by Day and Hour
+
+This section of the project visualizes median traffic speed across different hours and days using a heatmap.
+
+### 🔧 Code Breakdown
+
+- **Import Plotly Express:**
+  ```python
+  import plotly.express as px
+heatmap_data = df.pivot_table(index='hour', 
+                               columns='day_of_week', 
+                               values='speed',
+                               aggfunc='median')
+fig = px.imshow(heatmap_data,
+                labels=dict(x="Day", y="Hour", color="Speed (mph)"),
+                title="<b>Traffic Speed Patterns by Day and Hour</b>",
+                color_continuous_scale='RdYlGn_r')
+fig.update_layout(font=dict(size=12),
+                  coloraxis_colorbar=dict(title="Speed"))
+fig.write_html("heatmap.html")
+
+import plotly.express as px
+
+# Pivot table for heatmap
+heatmap_data = df.pivot_table(index='hour', 
+                            columns='day_of_week', 
+                            values='speed',
+                            aggfunc='median')
+
+fig = px.imshow(heatmap_data,
+               labels=dict(x="Day", y="Hour", color="Speed (mph)"),
+               title="<b>Traffic Speed Patterns by Day and Hour</b>",
+               color_continuous_scale='RdYlGn_r')  # Red=slow, Green=fast
+
+# Professional touches
+fig.update_layout(font=dict(size=12),
+                coloraxis_colorbar=dict(title="Speed"))
+fig.write_html("heatmap.html")  # Saves interactive version
+### 📦 Boxplot Visualization: Speed Distribution by Day
+
+- **Purpose:**  
+  Visualize traffic speed distribution for each day of the week to identify variability and congestion-prone days.
+
+- **Library Used:**  
+  Seaborn (`sns`) for statistical plotting and Matplotlib (`plt`) for formatting and saving.
+
+- **Plot Features:**
+  - `sns.boxplot()` displays the distribution of traffic speeds grouped by `day_of_week`.
+  - Color palette `"Blues"` provides a clean and professional look.
+  - A red dashed line (`axhline`) marks the **congestion threshold** at 20 mph.
+  - Text annotation (`plt.text`) labels the threshold line as *"Congestion Threshold"*.
+  
+- **Formatting:**
+  - Plot title: `"Speed Distribution by Weekday"`.
+  - Y-axis labeled as `"Speed (mph)"`; X-axis label hidden for clean look.
+  - Plot size set using `figsize=(10, 6)` for better readability.
+
+- **Output:**
+  - Plot saved as `speed_boxplot.png` with high resolution (`dpi=300`), suitable for reports or presentations.
+
+---
+
+📝 *This visualization helps identify which weekdays frequently fall below the congestion threshold, providing actionable insights for traffic management.*
+
+import seaborn as sns
+
+plt.figure(figsize=(10,6))
+ax = sns.boxplot(x='day_of_week', y='speed', data=df, palette="Blues")
+
+# Add annotations
+ax.axhline(20, color='red', linestyle='--')
+plt.text(6.5, 21, "Congestion Threshold", color='red')
+
+# Formatting
+plt.title("Speed Distribution by Weekday", pad=20)
+plt.xlabel("")
+plt.ylabel("Speed (mph)", labelpad=10)
+plt.savefig("speed_boxplot.png", dpi=300, bbox_inches='tight')
+### 📈 Scatter Plot: Interactive Speed Analysis Over Time
+
+- **Purpose:**  
+  Visualize how vehicle speed changes over time and across locations to detect patterns and anomalies interactively.
+
+- **Library Used:**  
+  Plotly Express for interactive and responsive plotting.
+
+- **Plot Features:**
+  - `px.scatter()` creates an interactive scatter plot using a **1,000-row sample** from the dataset for better performance.
+  - **X-axis:** `timestamp` – when the speed was recorded.  
+  - **Y-axis:** `speed` – vehicle speed in mph.
+  - **Color-coded by:** `location` – helps distinguish traffic patterns across different areas.
+  - **Hover Tooltips:** Show `hour` and `traffic_level` for deeper insight on mouseover.
+  - **Title:** Displayed as bold – `<b>Interactive Speed Analysis</b>`.
+
+- **Trendline:**
+  - A rolling average of speed is added using `fig.add_scatter()`.
+  - Smooths out fluctuations to reveal long-term trends in traffic flow.
+
+- **Output:**
+  - The interactive plot is saved as `scatter_plot.html`.
+  - Can be opened in any browser for zooming, filtering, and hovering.
+
+---
+
+💡 *This plot combines fine-grained time-based analysis with geographic insight, revealing both macro and micro traffic behavior patterns.*
+
+fig = px.scatter(df.sample(1000),  # Use subset for performance
+               x='timestamp',
+               y='speed',
+               color='location',
+               hover_data=['hour', 'traffic_level'],
+               title="<b>Interactive Speed Analysis</b>")
+
+# Add trendline
+fig.add_scatter(x=df['timestamp'], y=df['speed'].rolling(100).mean(),
+               mode='lines', name='Trend')
+
+fig.write_html("scatter_plot.html")
+### 🚦 Streamlit Dashboard: Smart City Traffic Insights
+
+- **Purpose:**  
+  Build an interactive web dashboard to showcase traffic trends and anomalies in a smart city setup.
+
+- **Framework Used:**  
+  [Streamlit](https://streamlit.io) – lightweight, Python-based web app framework for data apps.
+
+---
+
+### 🧩 Dashboard Structure
+
+- **Title:**  
+  `st.title("Smart City Traffic Insights")` – bold page header for user clarity.
+
+- **Tabs Used:**  
+  Created two tabs using `st.tabs()`:
+  
+  1. **Peak Hours**
+  2. **Anomalies**
+
+---
+
+### 📊 Tab 1: **Peak Hours**
+
+- Displays the interactive **heatmap** (`fig_heatmap`) of traffic speeds by hour and day.
+- **Insight Summary** (via `st.markdown()`):
+  - 🔴 Fridays at 5 PM show **worst congestion** (avg. 18 mph).
+  - ✅ Sundays maintain **most consistent traffic flow**.
+
+---
+
+### ⚠️ Tab 2: **Anomalies**
+
+- Shows the **scatter plot** (`fig_scatter`) for speed over time with a rolling trendline.
+- Includes a custom HTML alert box via `st.write(..., unsafe_allow_html=True)`:
+  - 📢 *“3 PM anomaly on Jan 15 likely due to major accident”*
+
+---
+
+### 💾 Output
+
+- **Live Web App**: Runs locally or can be deployed via Streamlit Cloud, Heroku, or other hosting platforms.
+- **Interactive UI**: Scroll, zoom, and hover-enabled charts offer rich user experience.
+
+---
+
+🧠 *This dashboard provides city planners with real-time visibility into traffic congestion trends and critical incident alerts — helping make data-driven urban mobility decisions.*
+
+import streamlit as st
+
+st.title("Smart City Traffic Insights")
+tab1, tab2 = st.tabs(["Peak Hours", "Anomalies"])
+
+with tab1:
+    st.plotly_chart(fig_heatmap)  # Your heatmap from earlier
+    st.markdown("""
+    **Key Insight**:  
+    → Fridays at 5 PM show worst congestion (avg. 18 mph)  
+    → Sundays have most consistent speeds
+    """)
+
+with tab2:
+    st.plotly_chart(fig_scatter)
+    st.write("""
+    <div style="background-color:#FFF3CD; padding:10px; border-radius:5px">
+    <b>Alert</b>: 3 PM anomaly on Jan 15 likely due to major accident
+    </div>
+    """, unsafe_allow_html=True)
