@@ -1,3 +1,6 @@
+![Heatmap](images/heatmap.png)
+![Line Plot](images/lineplot.png)
+![Histogram](images/histogram.png)
 # -Smart-City-Traffic-Pattern-Analyser
 - Imports essential Python libraries:
   - `pandas` for data manipulation.
